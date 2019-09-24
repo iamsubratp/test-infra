@@ -120,6 +120,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", server)
+	mux.Handle("/help", server)
 	externalplugins.ServeExternalPluginHelp(mux, log, plugin.HelpProvider)
 	httpServer := &http.Server{Addr: ":" + strconv.Itoa(o.port), Handler: mux}
 	interrupts.ListenAndServe(httpServer, 5*time.Second)
@@ -137,6 +138,8 @@ type Server struct {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// TODO: Move webhook handling logic out of hook binary so that we don't have to import all
 	// plugins just to validate the webhook.
+	fmt.Fprintf(w, "Event received. Have a nice day. %+v", r)
+
 	eventType, eventGUID, payload, ok, _ := github.ValidateWebhook(w, r, s.tokenGenerator())
 	if !ok {
 		return
